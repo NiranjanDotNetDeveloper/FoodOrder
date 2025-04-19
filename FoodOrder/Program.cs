@@ -1,4 +1,7 @@
 using FoodInfrastructure.DbContextClass;
+using FoodInfrastructure.RepositoryImpl;
+using FoodOrderCoreProject.Domain.RepositoryInterfaces;
+using FoodOrderCoreProject.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -10,6 +13,7 @@ namespace FoodOrder
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+           // builder.Services.AddAutoMapper(typeof(MappingProfile));
             builder.Services.AddDbContext<ApplicationDbContext>(option =>
             {
                 option.UseSqlServer(builder.Configuration.GetConnectionString("SqlConnection"));
@@ -42,6 +46,7 @@ namespace FoodOrder
             {
                 option.LoginPath = "/Account/Register";
             });
+            builder.Services.AddScoped<IProductRepository, ProductRepositoryImpl>();
             builder.Services.AddControllersWithViews();
             var app = builder.Build();
             app.UseStaticFiles();

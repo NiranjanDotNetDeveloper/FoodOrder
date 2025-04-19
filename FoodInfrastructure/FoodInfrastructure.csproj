@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <Folder Include="ExternalApiCalls\" />
-    <Folder Include="RepositoryImpl\" />
   </ItemGroup>
 
   <ItemGroup>
