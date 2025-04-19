@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using Microsoft.AspNetCore.Mvc;
 namespace FoodOrderCoreProject.DTOs
 {
     public class RegisterDTO
@@ -14,6 +14,7 @@ namespace FoodOrderCoreProject.DTOs
         public string? Name { get; set; }
         [Required(ErrorMessage = "Please enter your email.")]
         [EmailAddress]
+        [Remote(action: "CheckEmailIsAlreadyRegistered",controller:"Account",ErrorMessage ="Email is Already registered.")]
         public string? Email { get; set; }
         [PasswordPropertyText]
         [Required(ErrorMessage = "Please enter your password.")]

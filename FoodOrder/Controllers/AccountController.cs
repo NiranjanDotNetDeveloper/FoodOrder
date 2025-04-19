@@ -81,7 +81,7 @@ namespace FoodOrder.Controllers
             if (!ModelState.IsValid)
             {
                 errorList = ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage).ToList();
-                return View(errorList);
+                return View(login);
             }
             else
             {
@@ -89,10 +89,12 @@ namespace FoodOrder.Controllers
                 if (user != null)
                 {
                     await _signInManager.SignInAsync(user, false);
+                    TempData["SuccessMessage"] = "Logged in successfully!";
                     return Content("Logged in", "text/plain");
                 }
                 else
                 {
+                  
                     return RedirectToAction("Register");
                 }
             }
@@ -101,6 +103,19 @@ namespace FoodOrder.Controllers
         public IActionResult Error()
         {
             return View();
+        }
+
+        public async Task<JsonResult> CheckEmailIsAlreadyRegistered(string email)
+        {
+            var user =await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                return Json(false);
+            }
+            else
+            {
+                return Json(true);
+            }
         }
     }
 }
