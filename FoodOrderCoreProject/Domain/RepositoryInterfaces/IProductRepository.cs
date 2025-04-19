@@ -12,7 +12,7 @@ namespace FoodOrderCoreProject.Domain.RepositoryInterfaces
         Task<ProductDTO> GetProductByName(string name);
         Task<ProductDTO> AddNewProduct(ProductDTO product);
         Task<ProductUpdateDTO> UpdateAProduct(ProductUpdateDTO product);
-        Task<bool> DeleteProduct(ProductDTO product);
+        Task<bool> DeleteProduct(string productName);
         //Task<ProductDTO> SearchProduct(string searchBy, string searchText);
     }
 }

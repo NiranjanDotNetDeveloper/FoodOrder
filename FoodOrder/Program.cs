@@ -47,6 +47,7 @@ namespace FoodOrder
                 option.LoginPath = "/Account/Register";
             });
             builder.Services.AddScoped<IProductRepository, ProductRepositoryImpl>();
+            builder.Services.AddScoped<ICategoryRepository, CategoryRepositoryImpl>();
             builder.Services.AddControllersWithViews();
             var app = builder.Build();
             app.UseStaticFiles();

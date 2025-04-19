@@ -38,10 +38,10 @@ namespace FoodInfrastructure.RepositoryImpl
             
         }
 
-        public async Task<bool> DeleteProduct(ProductDTO product)
+        public async Task<bool> DeleteProduct(string productName)
         {
             bool isProductDeleted = false;
-            ProductDTO? productToBeDeleted = await _applicationDbContext.Products.Select(x=>x.ConvertProductToProductDTO()).FirstOrDefaultAsync(x => x.ProductName == product.ProductName);
+            ProductDTO? productToBeDeleted = await _applicationDbContext.Products.Select(x=>x.ConvertProductToProductDTO()).FirstOrDefaultAsync(x => x.ProductName == productName);
             if (productToBeDeleted == null)
             {
                 throw new ArgumentNullException("Products not found");

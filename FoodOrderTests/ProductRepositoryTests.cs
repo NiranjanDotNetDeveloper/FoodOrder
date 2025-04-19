@@ -71,8 +71,8 @@ namespace FoodOrderTests
         {
             var product = _fixture.Create<ProductDTO>();
             var result = true;
-            _mockProductRepo.Setup(x => x.DeleteProduct(It.IsAny<ProductDTO>())).ReturnsAsync(result);
-            var resultGet=await _mockProductRepo.Object.DeleteProduct(product);
+            _mockProductRepo.Setup(x => x.DeleteProduct(product.ProductName)).ReturnsAsync(result);
+            var resultGet=await _mockProductRepo.Object.DeleteProduct(product.ProductName);
             resultGet.Should().BeTrue();
         }
         [Fact]
