@@ -26,12 +26,15 @@
   ![image](https://github.com/user-attachments/assets/15d0dd84-c70b-44f1-abf3-96466e422d15)
 -   🛡️ Client-side validation has also been added.
   ![image](https://github.com/user-attachments/assets/474cffdb-5fd2-4360-8ebe-4b413fe7353d)
+
 - ⚙️ **Login Page**
   ![image](https://github.com/user-attachments/assets/7989c4c6-9056-4455-a237-fe3ecf7ad728)
   - 🛡️ Client-side validation has also been added.
   ![image](https://github.com/user-attachments/assets/f5ef820b-4145-449c-9fdb-543015671656)
  **Unit Test Results**
 ![image](https://github.com/user-attachments/assets/ef0e033f-acb7-4a8b-ba13-ac13d7758f03)
+- **Pipeline**
+![image](https://github.com/user-attachments/assets/ca85cf72-1211-43fd-916e-854ac36ac79a)
 
 
 
