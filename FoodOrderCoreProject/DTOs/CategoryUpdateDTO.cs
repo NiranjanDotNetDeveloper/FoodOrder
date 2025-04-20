@@ -18,8 +18,9 @@ namespace FoodOrderCoreProject.DTOs
     {
         public static CategoryUpdateDTO ConvertCategoryToCategoryUpdateDTO(this Category category)
         {
+            if (category == null)
+                throw new ArgumentNullException(nameof(category));
             CategoryUpdateDTO dto = new CategoryUpdateDTO();
-            dto.CategoryId = category.CategoryId;
             dto.CategoryName = category.CategoryName;
             return dto;
         }
