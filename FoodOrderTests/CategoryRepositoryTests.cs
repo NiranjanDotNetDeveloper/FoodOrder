@@ -1,7 +1,11 @@
 ﻿using AutoFixture;
 using FluentAssertions;
+using FoodInfrastructure.DbContextClass;
+using FoodInfrastructure.RepositoryImpl;
+using FoodOrderCoreProject.Domain.Entities;
 using FoodOrderCoreProject.Domain.RepositoryInterfaces;
 using FoodOrderCoreProject.DTOs;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -11,98 +15,110 @@ using System.Threading.Tasks;
 
 namespace FoodOrderTests
 {
-    public class CategoryRepositoryTests
+    public class CategoryRepositoryTests:IDisposable
     {
-        private readonly Mock<ICategoryRepository> _categoryRepository;
         private readonly IFixture _fixture;
+        private readonly ApplicationDbContext _dbContext;
+        private readonly CategoryRepositoryImpl _categoryRepository;
         public CategoryRepositoryTests()
         {
-            _categoryRepository = new Mock<ICategoryRepository>();
-            _fixture=new Fixture();
+            var options = new DbContextOptionsBuilder<ApplicationDbContext>().
+                UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()).Options;
+            _dbContext = new ApplicationDbContext(options);
+            _dbContext.Database.EnsureCreated();
+            _categoryRepository = new CategoryRepositoryImpl(_dbContext);
+            _fixture =new Fixture();
         }
         [Fact]
         public async Task GetAllCategory()
         {
-            List<CategoryDTO> listOfcategory = new List<CategoryDTO>()
-            {
-                new CategoryDTO(){CategoryName="Lunch"},
-                 new CategoryDTO(){CategoryName="Breakfast"},
-                  new CategoryDTO(){CategoryName="Dinner"},
-                   new CategoryDTO(){CategoryName="Nashta"},
-            };
-            _categoryRepository.Setup(x => x.GetAllCategory()).ReturnsAsync(listOfcategory);
-            var resultList = await _categoryRepository.Object.GetAllCategory();
-            resultList.Should().HaveCount(4);
+            _dbContext.Categories.AddRange(
+                   new Category() { CategoryName = "Lunch" },
+                 new Category() { CategoryName = "Breakfast" },
+                  new Category() { CategoryName = "Dinner" },
+                   new Category() { CategoryName = "Nashta" }
+                );
+            _dbContext.SaveChanges();
+            var result =await _categoryRepository.GetAllCategory();
+            result.Should().HaveCount(5);
         }
         [Fact]
         public async Task GetCategoryByName_invalidData()
         {
-            _categoryRepository.Setup(x => x.GetCategoryByName(null)).ThrowsAsync(new NotImplementedException());
-            await Assert.ThrowsAsync<NotImplementedException>(async () =>
+
+            await Assert.ThrowsAsync<ArgumentNullException>(async () =>
             {
-                await _categoryRepository.Object.GetCategoryByName(null);
+                await _categoryRepository.GetCategoryByName(null);
             });
         }
         [Fact]
         public async Task GetCategoryByName_ValidData()
         {
-            CategoryDTO cat = _fixture.Create<CategoryDTO>();
-            _categoryRepository.Setup(x => x.GetCategoryByName(cat.CategoryName)).ReturnsAsync(cat);
-            var result = await _categoryRepository.Object.GetCategoryByName(cat.CategoryName);
-            result.Should().BeSameAs(cat);
+            _dbContext.Categories.Add(new Category() { CategoryName = "Lunch" } );
+            _dbContext.SaveChanges();
+            var result = await _categoryRepository.GetCategoryByName("Lunch");
+            result.Should().NotBeNull();
         }
         [Fact]
         public async Task AddCategoryByName_invalidData()
         {
-            _categoryRepository.Setup(x => x.AddNewCategory(null)).ThrowsAsync(new NotImplementedException());
-            await Assert.ThrowsAsync<NotImplementedException>(async () =>
+          
+            await Assert.ThrowsAsync<ArgumentNullException>(async () =>
             {
-                await _categoryRepository.Object.AddNewCategory(null);
+                await _categoryRepository.AddNewCategory(null);
             });
         }
         [Fact]
         public async Task AddCategoryByName_ValidData()
         {
-            CategoryDTO cat = _fixture.Create<CategoryDTO>();
-            _categoryRepository.Setup(x => x.AddNewCategory(It.IsAny<CategoryDTO>())).ReturnsAsync(cat);
-            var result = await _categoryRepository.Object.AddNewCategory(cat);
+            var cat = _fixture.Create<Category>();
+            var result = await _categoryRepository.AddNewCategory(cat);
             result.Should().BeSameAs(cat);
             result.Should().NotBeNull();
+            var inDb = _dbContext.Categories.FirstOrDefault(x => x.CategoryName == cat.CategoryName);
+            inDb.Should().NotBeNull();
         }
         [Fact]
         public async Task RemoveCategoryByName_invalidData()
         {
-            _categoryRepository.Setup(x => x.DeleteCategory(null)).ThrowsAsync(new NotImplementedException());
-            await Assert.ThrowsAsync<NotImplementedException>(async () =>
+           
+            await Assert.ThrowsAsync<ArgumentNullException>(async () =>
             {
-                await _categoryRepository.Object.DeleteCategory(null);
+                await _categoryRepository.DeleteCategory(null);
             });
         }
         [Fact]
         public async Task RemoveCategoryByName_ValidData()
         {
-            CategoryDTO cat = _fixture.Create<CategoryDTO>();
-            _categoryRepository.Setup(x => x.DeleteCategory(cat.CategoryName)).ReturnsAsync(true);
-            var result = await _categoryRepository.Object.DeleteCategory(cat.CategoryName);
+            _dbContext.Categories.Add(new Category() { CategoryName = "Lunch" });
+            _dbContext.SaveChanges();
+            var result = await _categoryRepository.DeleteCategory("Lunch");
             result.Should().BeTrue();
-            
         }
         [Fact]
         public async Task UpdateCategoryByName_invalidData()
         {
-            _categoryRepository.Setup(x => x.UpdateACategory(null)).ThrowsAsync(new NotImplementedException());
-            await Assert.ThrowsAsync<NotImplementedException>(async () =>
+         
+            await Assert.ThrowsAsync<ArgumentNullException>(async () =>
             {
-                await _categoryRepository.Object.UpdateACategory(null);
+                await _categoryRepository.UpdateACategory(null);
             });
         }
         [Fact]
         public async Task UpdateCategoryByName_ValidData()
         {
-            CategoryUpdateDTO cat = _fixture.Create<CategoryUpdateDTO>();
-            _categoryRepository.Setup(x => x.UpdateACategory(It.IsAny<CategoryUpdateDTO>())).ReturnsAsync(cat);
-            var result = await _categoryRepository.Object.UpdateACategory(cat);
-            result.Should().BeSameAs(cat);
+            _dbContext.Categories.Add(new Category() { CategoryName = "Lunch" });
+            _dbContext.SaveChanges();
+            var cat = _dbContext.Categories.FirstOrDefault(x => x.CategoryName == "Lunch");
+            cat.CategoryName = "Niranjan";
+            var result = await _categoryRepository.UpdateACategory(cat);
+            result.CategoryName.Should().Be("Niranjan");
+        }
+
+        public void Dispose()
+        {
+            _dbContext.Database.EnsureDeleted();
+            _dbContext.Dispose();
         }
     }
 }

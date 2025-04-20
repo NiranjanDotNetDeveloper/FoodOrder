@@ -18,15 +18,15 @@ namespace FoodInfrastructure.RepositoryImpl
         {
             _applicationDbContext = dbContext;
         }
-        public async Task<CategoryDTO> AddNewCategory(CategoryDTO category)
+        public async Task<Category> AddNewCategory(Category category)
         {
             if (category == null)
             {
-                throw new NotImplementedException();
+                throw new ArgumentNullException(nameof(category));
             }
             else
             {
-                await _applicationDbContext.Categories.AddAsync(category.ConvertCategoryDTOToCategory());
+                await _applicationDbContext.Categories.AddAsync(category);
                 await _applicationDbContext.SaveChangesAsync();
                 return category;
             }
@@ -38,46 +38,46 @@ namespace FoodInfrastructure.RepositoryImpl
             bool status = false;
             if (string.IsNullOrEmpty(categoryName))
             {
-                throw new NotImplementedException();
+                throw new ArgumentNullException(nameof(categoryName));
             }
             else
             {
-                CategoryDTO? cat = await _applicationDbContext.Categories.Select(x => x.ConvertCategoryToCategoryDTO()).FirstOrDefaultAsync(x => x.CategoryName == categoryName);
-                _applicationDbContext.Categories.Remove(cat.ConvertCategoryDTOToCategory());
+                Category? cat = await _applicationDbContext.Categories.FirstOrDefaultAsync(x => x.CategoryName == categoryName);
+                _applicationDbContext.Categories.Remove(cat);
                 await _applicationDbContext.SaveChangesAsync();
                 status= true;
             }
             return status;
         }
-        public async Task<List<CategoryDTO>> GetAllCategory()
+        public async Task<List<Category>> GetAllCategory()
         {
-            return await _applicationDbContext.Categories.Select(x => x.ConvertCategoryToCategoryDTO()).ToListAsync();
+            return await _applicationDbContext.Categories.ToListAsync();
         }
 
-        public async Task<CategoryDTO> GetCategoryByName(string name)
+        public async Task<Category> GetCategoryByName(string name)
         {
             if (string.IsNullOrEmpty(name))
             {
-                throw new NotImplementedException();
+                throw new ArgumentNullException(nameof(name));
             }
             else
             {
-                CategoryDTO? cat = await _applicationDbContext.Categories.Select(x => x.ConvertCategoryToCategoryDTO()).FirstOrDefaultAsync(x => x.CategoryName == name);
+                Category? cat = await _applicationDbContext.Categories.FirstOrDefaultAsync(x => x.CategoryName == name);
                 return cat;
             }
         }
 
-        public async Task<CategoryUpdateDTO> UpdateACategory(CategoryUpdateDTO category)
+        public async Task<Category> UpdateACategory(Category category)
         {
             if (category==null)
             {
-                throw new NotImplementedException();
+                throw new ArgumentNullException(nameof(category));
             }
             else
             {
-                CategoryUpdateDTO? catUpdate = await _applicationDbContext.Categories.Select(x => x.ConvertCategoryToCategoryUpdateDTO()).FirstOrDefaultAsync(x => x.CategoryName == category.CategoryName);
+                Category? catUpdate = await _applicationDbContext.Categories.FirstOrDefaultAsync(x => x.CategoryId == category.CategoryId);
                 catUpdate.CategoryName = category.CategoryName;
-                _applicationDbContext.Categories.Update(catUpdate.ConvertCategoryUpdateDTOToCategory());
+                _applicationDbContext.Categories.Update(catUpdate);
                 await _applicationDbContext.SaveChangesAsync();
                 return catUpdate;
             }

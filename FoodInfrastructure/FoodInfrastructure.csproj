@@ -28,7 +28,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FoodOrderCoreProject\FoodOrderCoreProject.csproj" />
-    <ProjectReference Include="..\FoodOrderTests\FoodOrderTests.csproj" />
   </ItemGroup>
 
 </Project>

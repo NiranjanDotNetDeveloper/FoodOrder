@@ -18,22 +18,22 @@ namespace FoodInfrastructure.RepositoryImpl
         {
             _applicationDbContext = dbContext;
         }
-        public async Task<ProductDTO> AddNewProduct(ProductDTO product)
+        public async Task<Product> AddNewProduct(Product product)
         {
             if (product == null)
             {
-                throw new NotImplementedException();
+                throw new ArgumentNullException(nameof(product));
             }
             else
             {
-                ProductDTO productDTO = new ProductDTO();
-                productDTO.ProductName = product.ProductName;
-                productDTO.Price = product.Price;
-                productDTO.ProductDescription = product.ProductDescription;
-                productDTO.CategoryId = product.CategoryId;
-                await _applicationDbContext.Products.AddAsync(productDTO.ConvertProductDTOToProduct());
+                Product product1 = new Product();
+                product1.ProductName = product.ProductName;
+                product1.Price = product.Price;
+                product1.ProductDescription = product.ProductDescription;
+                product1.CategoryId = product.CategoryId;
+                await _applicationDbContext.Products.AddAsync(product1);
                 await _applicationDbContext.SaveChangesAsync();
-                return productDTO;
+                return product1;
             }
             
         }
@@ -41,23 +41,23 @@ namespace FoodInfrastructure.RepositoryImpl
         public async Task<bool> DeleteProduct(string productName)
         {
             bool isProductDeleted = false;
-            ProductDTO? productToBeDeleted = await _applicationDbContext.Products.Select(x=>x.ConvertProductToProductDTO()).FirstOrDefaultAsync(x => x.ProductName == productName);
+            Product? productToBeDeleted = await _applicationDbContext.Products.FirstOrDefaultAsync(x => x.ProductName == productName);
             if (productToBeDeleted == null)
             {
-                throw new ArgumentNullException("Products not found");
+                throw new ArgumentNullException(nameof(productName));
             }
             else
             {
-                _applicationDbContext.Products.Remove(productToBeDeleted.ConvertProductDTOToProduct());
+                _applicationDbContext.Products.Remove(productToBeDeleted);
                 await _applicationDbContext.SaveChangesAsync();
                 isProductDeleted = true;
             }
             return isProductDeleted;
         }
 
-        public async Task<List<ProductDTO>> GetAllProducts()
+        public async Task<List<Product>> GetAllProducts()
         {
-            List<ProductDTO>listOfDTO= await _applicationDbContext.Products.Select(x=>x.ConvertProductToProductDTO()).ToListAsync();
+            List<Product> listOfDTO= await _applicationDbContext.Products.ToListAsync();
             if (listOfDTO.Count <= 0) {
                 throw new ArgumentNullException("Products not found");
             }
@@ -67,48 +67,35 @@ namespace FoodInfrastructure.RepositoryImpl
             }
         }
 
-        public async Task<ProductDTO> GetProductByName(string name)
+        public async Task<Product> GetProductByName(string name)
         {
             if(string.IsNullOrEmpty(name))
             {
-                throw new NotImplementedException();
+                throw new ArgumentNullException("Product Name is null or empty.");
             }
             else
             {
-                ProductDTO? dto =await _applicationDbContext.Products.Select(x=>x.ConvertProductToProductDTO()).FirstOrDefaultAsync(x=>x.ProductName== name);
-                return dto;
+                Product? product =await _applicationDbContext.Products.FirstOrDefaultAsync(x=>x.ProductName== name);
+                return product;
             }
         }
 
-        //public Task<ProductDTO> SearchProduct(string searchBy, string searchText)
-        //{
-        //    if(string.IsNullOrEmpty(searchBy)|| string.IsNullOrEmpty(searchText))
-        //    throw new NotImplementedException();
-        //    else
-        //    {
-        //        if (searchBy == "ProductName")
-        //        {
-
-        //        }
-        //    }
-        //}
-
-        public async Task<ProductUpdateDTO> UpdateAProduct(ProductUpdateDTO product)
+        public async Task<Product> UpdateAProduct(Product product)
         {
             if (product == null)
             {
-                throw new NotImplementedException();
+                throw new ArgumentNullException(nameof(product));
             }
             else
             {
-                ProductUpdateDTO productDTO = new ProductUpdateDTO();
-                productDTO.ProductName = product.ProductName;
-                productDTO.Price = product.Price;
-                productDTO.ProductDescription = product.ProductDescription;
-                productDTO.CategoryId = product.CategoryId;
-                _applicationDbContext.Products.Update(productDTO.ConvertProductToProductUpdateDTO());
+                Product? productUpdate = await _applicationDbContext.Products.FindAsync(product.ProductId); 
+                productUpdate.ProductName = product.ProductName;
+                productUpdate.Price = product.Price;
+                productUpdate.ProductDescription = product.ProductDescription;
+                productUpdate.CategoryId = product.CategoryId;
+                _applicationDbContext.Products.Update(productUpdate);
                 await _applicationDbContext.SaveChangesAsync();
-                return productDTO;
+                return productUpdate;
             }
         }
     }
