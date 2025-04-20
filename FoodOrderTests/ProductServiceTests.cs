@@ -57,10 +57,27 @@ namespace FoodOrderTests
         [Fact]
         public async Task UpdateProduct_WithValidData()
         {
-            var product = _fixture.Create<ProductUpdateDTO>();
-            _mockProductRepository.Setup(x => x.UpdateAProduct(product.ConvertProductToProductUpdateDTO())).ReturnsAsync(product.ConvertProductToProductUpdateDTO());
-            var result = await _prodductServiceImpl.UpdateAProduct(product);
+            var category = _fixture.Create<Category>();
+            var productEntity = _fixture.Build<Product>()
+                                        .With(p => p.Category, category)
+                                        .Create();
+
+            var productUpdateDTO = new ProductUpdateDTO
+            {
+                ProductName = productEntity.ProductName,
+                ProductDescription = productEntity.ProductDescription,
+                Price = productEntity.Price,
+                CategoryId = productEntity.CategoryId,
+                Category = new CategoryUpdateDTO { CategoryName = category.CategoryName }
+            };
+
+            _mockProductRepository.Setup(x => x.UpdateAProduct(It.IsAny<Product>()))
+                                  .ReturnsAsync(productEntity);
+
+            var result = await _prodductServiceImpl.UpdateAProduct(productUpdateDTO);
+
             result.Should().NotBeNull();
+            result.ProductName.Should().Be(productUpdateDTO.ProductName);
         }
         [Fact]
         public async Task UpdateProduct_WithNullValues()

@@ -62,10 +62,15 @@ namespace FoodOrderTests
         [Fact]
         public async Task UpdateCategory_ValidData()
         {
-            var cat1 = _fixture.Create<CategoryUpdateDTO>();
-            _categoryRepository.Setup(x => x.UpdateACategory(cat1.ConvertCategoryUpdateDTOToCategory())).ReturnsAsync(cat1.ConvertCategoryUpdateDTOToCategory());
-            var result = await _categoryServiceImpl.UpdateACategory(cat1);
+            var category = _fixture.Build<Category>()
+                                   .With(c => c.CategoryName, "Test Category")
+                                   .Create();
+            _categoryRepository.Setup(x => x.UpdateACategory(It.IsAny<Category>()))
+                               .ReturnsAsync(category);
+            var dtoToUpdate = category.ConvertCategoryToCategoryUpdateDTO();
+            var result = await _categoryServiceImpl.UpdateACategory(dtoToUpdate);
             result.Should().NotBeNull();
+            result.CategoryName.Should().Be("Test Category");
         }
         [Fact]
         public async Task UpdateCategory_InvalidData()

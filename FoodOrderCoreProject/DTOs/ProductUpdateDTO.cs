@@ -32,5 +32,5 @@ namespace FoodOrderCoreProject.DTOs
                 productDTO.Category = product.Category.ConvertCategoryToCategoryUpdateDTO();
                 return productDTO;
             }
-        }
+    }
 }

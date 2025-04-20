@@ -88,7 +88,7 @@ namespace FoodInfrastructure.RepositoryImpl
             }
             else
             {
-                Product? productUpdate = await _applicationDbContext.Products.FindAsync(product.ProductId); 
+                Product? productUpdate = await _applicationDbContext.Products.FirstOrDefaultAsync(x=>x.ProductId==product.ProductId); 
                 productUpdate.ProductName = product.ProductName;
                 productUpdate.Price = product.Price;
                 productUpdate.ProductDescription = product.ProductDescription;

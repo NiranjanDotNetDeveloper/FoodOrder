@@ -73,8 +73,8 @@ namespace FoodOrderCoreProject.ServiceImpl
             }
             else
             {
-                await _productRepository.UpdateAProduct(product.ConvertProductToProductUpdateDTO());
-                return product;
+                var result=await _productRepository.UpdateAProduct(product.ConvertProductToProductUpdateDTO());
+                return result.ConvertProductToProductUpdateDTO();
             }
         }
     }
